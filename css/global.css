@@ -285,10 +285,17 @@ hr {
 
 /* ── Ratings UI ──────────────────────────────────────────────── */
 .star-rating span {
-  transition: color 0.2s ease;
+  transition: color 0.15s ease, transform 0.1s ease;
+  cursor: pointer;
+  display: inline-block;
+  color: #cbd5e1; /* Default grey color */
+}
+.star-rating span:hover {
+  transform: scale(1.1);
 }
 .star-rating span.active {
-  color: #fbbf24; /* Yellow for customer rating */
+  color: #fbbf24 !important; /* Yellow for filled star */
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
 }
 
 .rating-display {
@@ -302,7 +309,7 @@ hr {
   color: #cbd5e1; /* Gray for empty star in admin */
 }
 .rating-display span.filled {
-  color: #fbbf24; /* Yellow for filled star in admin */
+  color: #fbbf24 !important; /* Yellow for filled star in admin */
 }
 
 /* ── Welcome Slogan Header ───────────────────────────────────── */
