@@ -439,7 +439,11 @@ if (addProductForm) {
 
 // ── Delete product ────────────────────────────────────────────
 async function deleteProduct(productId, productName) {
-  if (!confirm(`Delete "${productName}"? This cannot be undone.`)) return;
+  const isBuiltIn = isBuiltInProductId(productId);
+  const msg = isBuiltIn 
+    ? `Delete "${productName}" from the default list?`
+    : `Delete "${productName}"? This cannot be undone.`;
+  if (!confirm(msg)) return;
   try {
     if (isBuiltInProductId(productId)) {
       await hideDefaultProduct(productId);
@@ -568,7 +572,10 @@ if (editProductForm) {
           ...(source.description && { description: source.description }),
         };
 
-        await setDoc(doc(db, 'products', id), builtInData, { merge: true });
+        // Instead of setting doc by ID (which may fail permissions), add as new and hide the default one
+        await addDoc(collection(db, 'products'), builtInData);
+        await hideDefaultProduct(id);
+        
         showToast('✅ Default product promoted to Firestore and updated!', 'success');
         closeEditModal();
         await loadProducts();
