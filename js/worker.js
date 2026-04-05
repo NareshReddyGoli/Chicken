@@ -66,7 +66,7 @@ function startOrderListener() {
     }
     isInitialLoad = false;
     // Sort client-side: newest first (no Firestore index required)
-    const docs = snapshot.docs.sort((a, b) => {
+    const docs = [...snapshot.docs].sort((a, b) => {
       const ta = a.data().timestamp?.seconds || 0;
       const tb = b.data().timestamp?.seconds || 0;
       return tb - ta;

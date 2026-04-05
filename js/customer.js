@@ -836,7 +836,11 @@ orderDetailsForm.addEventListener('submit', async (e) => {
       localStorage.setItem('lastOrderId', docRef.id);
       startLastOrderListener(docRef.id);
     } catch(fbErr) {
-      console.warn("Firebase sync delayed.", fbErr);
+      if (fbErr.message === 'Firebase timeout') {
+        console.warn("Firebase sync delayed.", fbErr);
+      } else {
+        throw fbErr;
+      }
     }
 
     closeOrderModal();
