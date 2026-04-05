@@ -628,12 +628,11 @@ if (editProductForm) {
           return;
         }
 
-        // Some projects enforce strict allowed fields in Firestore rules.
-        // Retry with base fields so name/price edits still work.
         const isPermissionDenied = String(err?.code || '').includes('permission-denied');
-        const hasOptionalFields = Object.keys(updates).length > Object.keys(baseUpdates).length;
-        if (!(isPermissionDenied && hasOptionalFields)) throw err;
-        await updateDoc(doc(db, 'products', id), baseUpdates);
+        if (isPermissionDenied) {
+          throw new Error('permission-denied');
+        }
+        throw err;
       }
 
       showToast('✅ Product updated!', 'success');
@@ -642,8 +641,12 @@ if (editProductForm) {
     } catch (err) {
       console.error('Update error:', err);
       if (editModalError) {
-        const errCode = err?.code ? ` (${err.code})` : '';
-        editModalError.textContent = `Failed to update. Check permissions${errCode}.`;
+        if (err.message === 'permission-denied' || String(err?.code || '').includes('permission-denied')) {
+           editModalError.innerHTML = '<strong>Permission Denied by Firebase:</strong> Your Firebase Security "update" Rules for products currently do not allow editing "weight" or "category" fields. Please update your Rules in the Firebase Console to allow these fields.';
+        } else {
+           const errCode = err?.code ? ` (${err.code})` : '';
+           editModalError.textContent = `Failed to update. Check permissions${errCode}.`;
+        }
         editModalError.style.display = 'block';
       }
     } finally {
