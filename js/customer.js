@@ -260,7 +260,7 @@ function deactivateAdminMode() {
 
 // ── Image compression helper ──────────────────────────────────
 function compressImage(file, targetWidth, targetHeight, quality = 0.8) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -270,17 +270,14 @@ function compressImage(file, targetWidth, targetHeight, quality = 0.8) {
         let sx = 0;
         let sy = 0;
 
-        // Auto-center-crop to the aspect ratio of targetWidth/targetHeight
         const targetAspect = targetWidth / targetHeight;
         const imgAspect = sw / sh;
 
         if (imgAspect > targetAspect) {
-          // Image is wider than target aspect
           const newSw = sh * targetAspect;
           sx = (sw - newSw) / 2;
           sw = newSw;
         } else {
-          // Image is taller than target aspect
           const newSh = sw / targetAspect;
           sy = (sh - newSh) / 2;
           sh = newSh;
@@ -292,8 +289,10 @@ function compressImage(file, targetWidth, targetHeight, quality = 0.8) {
         canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
         resolve(canvas.toDataURL('image/jpeg', quality));
       };
+      img.onerror = () => reject(new Error('Failed to load image for compression'));
       img.src = e.target.result;
     };
+    reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
 }
@@ -303,16 +302,23 @@ const apfImageInput   = document.getElementById('apf-image');
 const apfImagePreview = document.getElementById('apf-image-preview');
 const apfImageLabel   = document.getElementById('apf-image-label');
 
+let _addProductCompressedImage = null;
+
 if (apfImageInput) {
   apfImageInput.addEventListener('change', async () => {
     const file = apfImageInput.files[0];
     if (!file) return;
-    // For standard product uploads, we still use 600x600 square for now
-    const compressed = await compressImage(file, 600, 600);
-    apfImagePreview.src          = compressed;
-    apfImagePreview.style.display = 'block';
-    apfImageLabel.textContent    = `✅ ${file.name}`;
-    apfImageLabel.classList.add('has-image');
+    apfImageLabel.textContent = '⏳ Compressing…';
+    try {
+      _addProductCompressedImage = await compressImage(file, 600, 600, 0.8);
+      apfImagePreview.src          = _addProductCompressedImage;
+      apfImagePreview.style.display = 'block';
+      apfImageLabel.textContent    = `✅ ${file.name}`;
+      apfImageLabel.classList.add('has-image');
+    } catch (e) {
+      console.error('Compression error:', e);
+      apfImageLabel.textContent    = `❌ Invalid image file`;
+    }
   });
 }
 
@@ -402,12 +408,13 @@ if (addProductForm) {
     apfSubmitBtn.textContent = 'Adding…';
 
     try {
-      // Compress & encode image if provided
-      let imageUrl = null;
-      if (imgFile) {
-        apfSubmitBtn.textContent = 'Uploading image…';
+      let imageUrl = _addProductCompressedImage;
+      if (imgFile && !imageUrl) {
+        apfSubmitBtn.textContent = 'Compressing image…';
         imageUrl = await compressImage(imgFile, 600, 600, 0.8);
       }
+      
+      apfSubmitBtn.textContent = 'Adding to database…';
 
       const data = {
         name, price, category, timestamp: serverTimestamp(),
@@ -419,10 +426,28 @@ if (addProductForm) {
         ...(imageUrl  && { imageUrl }),
       };
 
-      await addDoc(collection(db, 'products'), data);
+      // Wrap in timeout race to prevent hanging indefinitely on flaky connections
+      let timeoutId;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('Firebase timeout')), 5000);
+      });
+      const docPromise = addDoc(collection(db, 'products'), data);
+      
+      try {
+        await Promise.race([docPromise, timeoutPromise]);
+        clearTimeout(timeoutId);
+      } catch (e) {
+        if (e.message === 'Firebase timeout') {
+           console.warn('Firebase write delayed due to network. Will sync in background.');
+        } else {
+           throw e;
+        }
+      }
+
       showToast(`✅ "${name}" added to products!`, 'success');
       addProductForm.reset();
-      // Reset image preview
+      _addProductCompressedImage = null;
+      if (apfImageInput) apfImageInput.value = '';
       if (apfImagePreview) { apfImagePreview.src = ''; apfImagePreview.style.display = 'none'; }
       if (apfImageLabel)   { apfImageLabel.textContent = '📷 Click to upload image from device'; apfImageLabel.classList.remove('has-image'); }
       await loadProducts();
