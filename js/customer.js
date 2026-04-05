@@ -51,57 +51,9 @@ function getProductImage(product) {
 }
 
 // ── State ─────────────────────────────────────────────────────
-const FALLBACK_PRODUCTS = [
-  { id: 'default1', name: 'Original Chicken Curry Cut', price: 249, originalPrice: 299, badge: 'Best', weight: '500g', serves: 'Serves 2' },
-  { id: 'default2', name: 'Premium Chicken Breast',     price: 349, originalPrice: 399, badge: 'New',  weight: '500g', serves: 'Serves 2' },
-  { id: 'default3', name: 'Farm Fresh Classic Eggs',    price: 125, badge: 'Cold', weight: '12 pcs', serves: 'Daily Breakfast' },
-  { id: 'default4', name: 'Chicken Keema (Mince)',       price: 310, originalPrice: 350, weight: '500g', serves: 'Serves 3-4' }
-];
-
-// ── "What's Cooking Today" — separate daily specials ─────────
-const COOKING_TODAY = [
-  { id: 'cook1', name: 'Spicy Andhra Chicken Fry',     price: 279, originalPrice: 329, badge: 'Best',  weight: '500g',  serves: 'Serves 2',   imageUrl: 'images/chicken_curry.png' },
-  { id: 'cook2', name: 'Chicken Lollipop (6 pcs)',      price: 199, originalPrice: 249, badge: 'New',   weight: '300g',  serves: 'Starter',    imageUrl: 'images/chicken_breast.png' },
-  { id: 'cook3', name: 'Boneless Chicken Tikka',        price: 389, originalPrice: 450, badge: 'Best',  weight: '500g',  serves: 'Serves 2-3', imageUrl: 'images/chicken_breast.png' },
-  { id: 'cook4', name: 'Mutton Keema Special',          price: 420, originalPrice: 480,                 weight: '500g',  serves: 'Serves 3',   imageUrl: 'images/keema.png' },
-  { id: 'cook5', name: 'Egg Curry Masala (Home Style)', price: 149, originalPrice: 180, badge: 'Cold',  weight: '4 eggs',serves: 'Serves 2',   imageUrl: 'images/eggs.png' },
-  { id: 'cook6', name: 'Chicken Biryani Cut (Raw)',     price: 299, originalPrice: 349, badge: 'New',   weight: '750g',  serves: 'Serves 3-4', imageUrl: 'images/chicken_curry.png' },
-];
-
 let cart          = [];
 let productsCache = [];
 let isAdminMode   = false;
-
-function isBuiltInProductId(id) {
-  const pid = String(id || '');
-  return pid.startsWith('default') || pid.startsWith('cook');
-}
-
-function getBuiltInProductById(id) {
-  const pid = String(id || '');
-  return [...FALLBACK_PRODUCTS, ...COOKING_TODAY].find(p => p.id === pid) || null;
-}
-
-const HIDDEN_DEFAULTS_DOC = doc(db, 'settings', 'hidden-default-products');
-
-async function getHiddenDefaultIds() {
-  try {
-    const snap = await getDoc(HIDDEN_DEFAULTS_DOC);
-    if (!snap.exists()) return new Set();
-    const ids = Array.isArray(snap.data()?.ids) ? snap.data().ids : [];
-    return new Set(ids.map(String));
-  } catch (err) {
-    console.warn('Failed to load hidden default products:', err);
-    return new Set();
-  }
-}
-
-async function hideDefaultProduct(id) {
-  await setDoc(HIDDEN_DEFAULTS_DOC, {
-    ids: arrayUnion(String(id)),
-    updatedAt: serverTimestamp(),
-  }, { merge: true });
-}
 
 // ── DOM refs – Shop ───────────────────────────────────────────
 const productContainer  = document.getElementById('product-container');
@@ -464,24 +416,9 @@ if (addProductForm) {
 
 // ── Delete product ────────────────────────────────────────────
 async function deleteProduct(productId, productName) {
-  const isBuiltIn = isBuiltInProductId(productId);
-  const msg = isBuiltIn 
-    ? `Delete "${productName}" from the default list?`
-    : `Delete "${productName}"? This cannot be undone.`;
+  const msg = `Delete "${productName}"? This cannot be undone.`;
   if (!confirm(msg)) return;
   try {
-    if (isBuiltInProductId(productId)) {
-      await hideDefaultProduct(productId);
-      try {
-        await deleteDoc(doc(db, 'products', productId));
-      } catch (_) {
-        // It's okay if the document does not exist yet.
-      }
-      showToast(`"${productName}" permanently hidden.`, 'success');
-      await loadProducts();
-      return;
-    }
-
     await deleteDoc(doc(db, 'products', productId));
     showToast(`"${productName}" deleted.`, 'success');
     await loadProducts();
@@ -575,37 +512,6 @@ if (editProductForm) {
         price,
         ...(imageUrl && { imageUrl }),
       };
-
-      const isBuiltIn = isBuiltInProductId(id);
-      if (isBuiltIn) {
-        const source = getBuiltInProductById(id) || {};
-        const fallbackCategory = String(id).startsWith('cook') ? 'daily' : 'regular';
-        const finalCategory = (editCategorySelect && category) ? category : (source.category || fallbackCategory);
-        const currentImage = editProductForm?.dataset?.currentImage || source.imageUrl || getProductImage(source || { name });
-
-        const builtInData = {
-          name,
-          price,
-          category: finalCategory,
-          timestamp: serverTimestamp(),
-          ...(weight && { weight }),
-          ...((imageUrl || currentImage) && { imageUrl: imageUrl || currentImage }),
-          ...(source.originalPrice && { originalPrice: source.originalPrice }),
-          ...(source.badge && { badge: source.badge }),
-          ...(source.serves && { serves: source.serves }),
-          ...(source.pieces && { pieces: source.pieces }),
-          ...(source.description && { description: source.description }),
-        };
-
-        // Instead of setting doc by ID (which may fail permissions), add as new and hide the default one
-        await addDoc(collection(db, 'products'), builtInData);
-        await hideDefaultProduct(id);
-        
-        showToast('✅ Default product promoted to Firestore and updated!', 'success');
-        closeEditModal();
-        await loadProducts();
-        return;
-      }
 
       const updates = {
         ...baseUpdates,
@@ -704,16 +610,12 @@ async function loadProducts() {
   if (productContainer2) productContainer2.innerHTML = '<div class="loader"><span class="spinner"></span>Loading fresh products…</div>';
 
   try {
-    const hiddenDefaultIds = await getHiddenDefaultIds();
     const snap = await getDocs(collection(db, 'products'));
 
     if (snap.empty) {
-      const regularFallback = FALLBACK_PRODUCTS.filter(p => !hiddenDefaultIds.has(String(p.id)));
-      const dailyFallback = COOKING_TODAY.filter(p => !hiddenDefaultIds.has(String(p.id)));
-
-      productsCache = regularFallback;
-      renderProducts(productsCache, productContainer);
-      if (productContainer2) renderProducts(dailyFallback, productContainer2);
+      productContainer.innerHTML = '<p style="padding:20px;text-align:center;color:#666;">No products available at the moment.</p>';
+      if (productContainer2) productContainer2.innerHTML = '<p style="padding:20px;text-align:center;color:#666;">No daily specials available.</p>';
+      productsCache = [];
     } else {
       let regularProducts = [];
       let dailyProducts = [];
@@ -732,10 +634,9 @@ async function loadProducts() {
     }
   } catch (err) {
     console.error('Error loading products:', err);
-    // Fallback on error
-    productsCache = FALLBACK_PRODUCTS;
-    renderProducts(productsCache, productContainer);
-    if (productContainer2) renderProducts(COOKING_TODAY, productContainer2);
+    productContainer.innerHTML = '<p style="padding:20px;text-align:center;color:red;">Failed to load products.</p>';
+    if (productContainer2) productContainer2.innerHTML = '<p style="padding:20px;text-align:center;color:red;">Failed to load products.</p>';
+    productsCache = [];
   }
 }
 
