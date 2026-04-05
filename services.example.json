@@ -1,0 +1,8 @@
+{
+  "type": "service_account",
+  "project_id": "your-firebase-project-id",
+  "private_key_id": "replace-with-a-revoked-key-id",
+  "private_key": "store-private-keys-outside-this-repo",
+  "client_email": "firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com",
+  "client_id": "replace-with-your-service-account-client-id"
+}

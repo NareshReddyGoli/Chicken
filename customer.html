@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm2Buy - Fresh Farm Products Online</title>
+  <meta name="description" content="Buy fresh farm products directly from farmers at Farm2Buy">
+  <meta property="og:title" content="Farm2Buy - Fresh Farm Products Online">
+  <meta property="og:image" content="images/logo.jpg">
+  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/customer-page.css">
+</head>
+
+<body>
+
+  <!-- ══ NAVBAR ══════════════════════════════════════════════ -->
+  <nav class="navbar">
+    <a href="#" class="navbar-brand" style="display:flex; align-items:center; gap: 16px; text-decoration:none;">
+      <img src="images/logo.jpg" alt="RK FARMS" style="height:80px;object-fit:contain;margin:-10px 0;">
+      
+      <!-- Catchy Welcome Slogan -->
+      <div class="welcome-slogan">
+        <div class="slogan-title">
+          <span class="slogan-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </span>
+          <h2>Welcome to RK Farms</h2>
+        </div>
+        <p>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Your Trusted Source for Fresh &amp; Hygienic Chicken
+        </p>
+      </div>
+    </a>
+    <div class="navbar-right">
+      <!-- Shown only when admin is logged in -->
+      <span id="admin-badge"
+        style="display:none;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:#e8001c;border:1px solid #e8001c;padding:4px 12px;border-radius:999px;"><img
+          src="images/admin.png" style="width:14px;height:14px;object-fit:contain;"> Admin</span>
+      <a href="admin.html" id="admin-dashboard-link"
+        style="display:none;align-items:center;gap:6px;font-size:0.83rem;font-weight:700;color:#fff;background:#e8001c;padding:6px 14px;border-radius:999px;text-decoration:none;transition:background 0.2s;"><img
+          src="images/dashboard.png" style="width:16px;height:16px;object-fit:contain;"> Dashboard</a>
+      <button class="staff-link" id="admin-logout-btn" style="display:none;">Logout</button>
+      <!-- Shown when no staff is logged in -->
+      <div id="staff-login-btns" style="display: flex; gap: 8px;">
+        <button class="staff-link" id="worker-login-btn" style="display:flex;align-items:center;gap:6px;">
+          <img src="images/worker.png" alt="Worker" style="width:18px;height:18px;object-fit:contain;"> Worker Login
+        </button>
+        <button class="staff-link" id="admin-login-btn" style="display:flex;align-items:center;gap:6px;">
+          <img src="images/admin.png" alt="Admin" style="width:20px;height:20px;object-fit:contain;"> Admin Login
+        </button>
+      </div>
+      <button class="cart-btn" id="cart-toggle-btn">
+        <img src="images/cart.png" alt="Cart" style="width:20px;height:20px;object-fit:contain;"> Cart
+        <span class="cart-count" id="cart-count-badge">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE CONTENT ════════════════════════════════════════ -->
+  <div class="page-wrap">
+
+    <!-- ══ ADMIN PANEL (hidden by default, shown after admin login) ══ -->
+    <div id="admin-panel" style="display:none;">
+      <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h2>👑 Admin Controls</h2>
+          <p>Manage your product catalogue and site branding from here.</p>
+        </div>
+        <a href="admin.html" class="place-order-btn"
+          style="text-decoration:none; display:flex; align-items:center; gap:8px; padding:10px 20px; font-size:0.9rem; background:#1c1c1c;">
+          <img src="images/dashboard.png" style="width:18px;height:18px;filter:invert(1);">
+          Go to Orders Dashboard
+        </a>
+      </div>
+
+
+      <!-- Add Product Form -->
+      <form id="add-product-form" class="add-product-card">
+        <h3>➕ Add New Product</h3>
+        <div class="apf-row">
+          <div class="apf-field">
+            <label for="apf-name">Product Name *</label>
+            <input type="text" id="apf-name" placeholder="e.g. Chicken Breast Boneless" required>
+          </div>
+          <div class="apf-field">
+            <label for="apf-price">Price (₹) *</label>
+            <input type="number" id="apf-price" placeholder="e.g. 299" min="0" step="0.01" required>
+          </div>
+        </div>
+        <div class="apf-row">
+          <div class="apf-field">
+            <label for="apf-original">Offer Price (₹)</label>
+            <input type="number" id="apf-original" placeholder="For discount display" min="0" step="0.01">
+          </div>
+          <div class="apf-field">
+            <label for="apf-badge">Badge</label>
+            <select id="apf-badge">
+              <option value="">None</option>
+              <option value="New">🔴 New</option>
+              <option value="Best">🟢 Best Seller</option>
+              <option value="Cold">🔵 Cold Standard</option>
+            </select>
+          </div>
+        </div>
+        <div class="apf-field">
+          <label for="apf-category">Category *</label>
+          <select id="apf-category" required>
+            <option value="regular">Current Hits (Main)</option>
+            <option value="daily">What's Cooking Today</option>
+          </select>
+        </div>
+        <div class="apf-row">
+          <div class="apf-field">
+            <label for="apf-weight">Weight</label>
+            <input type="text" id="apf-weight" placeholder="e.g. 500 g">
+          </div>
+          <div class="apf-field">
+            <label for="apf-serves">Serves</label>
+            <input type="text" id="apf-serves" placeholder="e.g. Serves 4">
+          </div>
+        </div>
+        <div class="apf-field" style="margin-bottom:0">
+          <label for="apf-desc">Description</label>
+          <input type="text" id="apf-desc" placeholder="Short description (optional)">
+        </div>
+        <div class="apf-field" style="margin-top:12px;">
+          <label for="apf-image">Product Image (optional)</label>
+          <label for="apf-image" class="apf-image-label" id="apf-image-label">
+            📷 Click to upload image from device
+          </label>
+          <input type="file" id="apf-image" accept="image/*" style="display:none;">
+          <img id="apf-image-preview" src="" alt="Preview"
+            style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-top:8px;border:1.5px solid var(--border);">
+        </div>
+        <div id="apf-error" style="display:none;"></div>
+        <button type="submit" class="apf-submit" id="apf-submit-btn">Add Product</button>
+      </form>
+    </div>
+
+    <!-- Hero Banner -->
+    <div class="hero">
+      <img src="images/hero_banner.jpg" alt="Fresh RK FARMS – Fast Delivery">
+    </div>
+
+    <!-- Section: Our current hits -->
+    <div class="section-title">
+      <h2>Our current hits</h2>
+      <p>Here's what everyone's eating!</p>
+    </div>
+
+    <div class="products-row" id="product-container">
+      <div class="loader"><span class="spinner"></span>Loading fresh products…</div>
+    </div>
+
+    <!-- Promo Banner -->
+    <div class="promo-banner">
+      <div>
+        <p class="promo-text">🔥 Farm fresh. Always.</p>
+        <p class="promo-sub">All chicken sourced fresh daily – zero frozen</p>
+      </div>
+      <div class="promo-arrow">→</div>
+    </div>
+
+    <!-- Section: What's cooking today -->
+    <div class="section-title">
+      <h2>What's cooking today?</h2>
+      <p>Freshest meats and much more!</p>
+    </div>
+
+    <div class="products-row" id="product-container-2"></div>
+
+  </div>
+
+  <!-- ══ CART SIDEBAR ════════════════════════════════════════ -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <aside class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3 style="display:flex;align-items:center;gap:8px;"><img src="images/cart.png" alt="Cart"
+          style="width:24px;height:24px;object-fit:contain;"> Your Cart</h3>
+      <button class="cart-close" id="cart-close-btn">✕</button>
+    </div>
+    <div class="cart-items-wrap" id="cart-items-wrap">
+      <div class="cart-empty-msg" id="cart-empty-msg">
+        <span class="icon"><img src="images/cart.png" alt="Cart"
+            style="width:50px;height:50px;object-fit:contain;opacity:0.7;"></span>
+        Your cart is empty.<br>Add products to get started!
+      </div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span class="label">Total</span>
+        <span class="amount" id="cart-total">₹0</span>
+      </div>
+      <p style="font-size:0.82rem;color:#6b7280;margin-bottom:12px;">💵 Payment collected offline at delivery</p>
+      <button class="place-order-btn" id="place-order-btn" disabled>Place Order</button>
+    </div>
+  </aside>
+
+  <!-- ══ STAFF LOGIN MODAL ════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-overlay"></div>
+
+  <div class="login-modal" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h3 id="modal-title">🔐 Login</h3>
+      <button class="modal-close" id="modal-close-btn" aria-label="Close">✕</button>
+    </div>
+
+    <p class="modal-sub" id="modal-subtext">Sign in to your account.</p>
+
+    <!-- Inline error -->
+    <div class="modal-error" id="modal-error" style="display:none;"></div>
+
+    <form id="staff-login-form" autocomplete="off" novalidate>
+      <div class="modal-field">
+        <label for="staff-username">Username</label>
+        <input type="text" id="staff-username" placeholder="Enter username" autocomplete="off" required>
+      </div>
+      <div class="modal-field">
+        <label for="staff-password">Password</label>
+        <input type="password" id="staff-password" placeholder="Enter password" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="modal-submit-btn" id="modal-submit-btn">
+        Login to Dashboard
+      </button>
+    </form>
+  </div>
+
+  <!-- ══ BRANDING DIMENSION MODAL ══════════════════════════════ -->
+  <div class="modal-overlay" id="branding-modal-overlay"></div>
+  <div class="login-modal" id="branding-modal" role="dialog" aria-modal="true" aria-labelledby="branding-modal-title"
+    style="max-width:400px;">
+    <div class="modal-header">
+      <h3 id="branding-modal-title">🖼️ Set Image Size</h3>
+      <button class="modal-close" id="branding-modal-close" aria-label="Close">✕</button>
+    </div>
+    <p class="modal-sub">Specify the dimensions for your owner logo profile.</p>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin:20px 0;">
+      <div class="modal-field">
+        <label for="branding-width">Width (px)</label>
+        <input type="number" id="branding-width" value="250" min="50" max="1000">
+      </div>
+      <div class="modal-field">
+        <label for="branding-height">Height (px)</label>
+        <input type="number" id="branding-height" value="250" min="50" max="1000">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px;">
+      <button class="modal-submit-btn" id="branding-finalize-btn" style="flex:2;">Apply & Upload</button>
+      <button class="btn-ghost" id="branding-cancel-btn" style="flex:1; border-radius:12px;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══ RATING MODAL ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="rating-modal-overlay"></div>
+  <div class="login-modal" id="rating-modal" role="dialog" aria-modal="true" aria-labelledby="rating-modal-title"
+    style="max-width:400px; text-align:center;">
+    <div class="modal-header">
+      <h3 id="rating-modal-title" style="width:100%; text-align:center;">🌟 Rate Your Order</h3>
+      <button class="modal-close" id="rating-modal-close" aria-label="Close"
+        style="position:absolute; right:20px; top:20px;">✕</button>
+    </div>
+    <p class="modal-sub">How was your chicken today? Your feedback helps us grow!</p>
+
+    <div class="star-rating" id="star-rating-container"
+      style="color: #cbd5e1; font-size: 2.5rem; letter-spacing: 8px; cursor: pointer; margin-bottom: 24px;">
+      <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span
+        data-value="4">★</span><span data-value="5">★</span>
+    </div>
+
+    <form id="rating-form">
+      <div class="modal-field">
+        <label for="rating-comment">Brief Comment (Optional)</label>
+        <input type="text" id="rating-comment" placeholder="e.g. Delicious and super fresh!">
+      </div>
+      <button type="submit" class="modal-submit-btn" id="rating-submit-btn">Send My Rating</button>
+    </form>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- ══ CUSTOMER DETAILS MODAL ══════════════════════════════ -->
+  <div class="modal-overlay" id="order-modal-overlay"></div>
+  <div class="login-modal" id="order-modal" role="dialog" aria-modal="true" aria-labelledby="order-modal-title"
+    style="max-width:460px;">
+    <div class="modal-header">
+      <h3 id="order-modal-title">📦 Delivery Details</h3>
+      <button class="modal-close" id="order-modal-close" aria-label="Close">✕</button>
+    </div>
+    <p class="modal-sub">Tell us where to deliver your order.</p>
+
+    <div class="modal-error" id="order-modal-error" style="display:none;"></div>
+
+    <form id="order-details-form" novalidate>
+      <div class="modal-field">
+        <label for="cust-name">Full Name *</label>
+        <input type="text" id="cust-name" placeholder="e.g. Poojan Sri" required>
+      </div>
+      <div class="modal-field">
+        <label for="cust-mobile">Mobile Number *</label>
+        <input type="tel" id="cust-mobile" placeholder="e.g. 9876543210" maxlength="10" required>
+      </div>
+      <div class="modal-field">
+        <label for="cust-address">Delivery Address *</label>
+        <textarea id="cust-address" rows="3" placeholder="House No, Street, Area, City…" required
+          style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:0.95rem;color:var(--text);background:#fafafa;outline:none;resize:vertical;transition:border-color 0.22s ease;"></textarea>
+      </div>
+      <button type="submit" class="modal-submit-btn" id="order-confirm-btn">
+        🎉 Confirm Order
+      </button>
+    </form>
+  </div>
+  <!-- ══ EDIT PRODUCT MODAL ══════════════════════════════════ -->
+  <div class="modal-overlay" id="edit-modal-overlay"></div>
+  <div class="login-modal" id="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title"
+    style="max-width:460px;">
+    <div class="modal-header">
+      <h3 id="edit-modal-title">✏️ Edit Product</h3>
+      <button class="modal-close" id="edit-modal-close" aria-label="Close">✕</button>
+    </div>
+    <p class="modal-sub">Update the product name, price, weight, or image.</p>
+
+    <div class="modal-error" id="edit-modal-error" style="display:none;"></div>
+
+    <form id="edit-product-form" novalidate>
+      <input type="hidden" id="edit-prod-id">
+      <div class="modal-field">
+        <label for="edit-name">Product Name *</label>
+        <input type="text" id="edit-name" required>
+      </div>
+      <div class="modal-field">
+        <label for="edit-price">Price (₹) *</label>
+        <input type="number" id="edit-price" min="0" step="0.01" required>
+      </div>
+      <div class="modal-field">
+        <label for="edit-weight">Weight (e.g. 500 g or 1 kg)</label>
+        <input type="text" id="edit-weight" placeholder="e.g. 1 kg">
+      </div>
+      <div class="modal-field">
+        <label for="edit-category">Category</label>
+        <select id="edit-category" style="width:100%; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; font-family:inherit; font-size:0.95rem; background:#fafafa; outline:none;">
+          <option value="regular">Current Hits (Main)</option>
+          <option value="daily">What's Cooking Today</option>
+        </select>
+      </div>
+      <div class="apf-field" style="margin-top:12px;">
+        <label for="edit-image">Product Image (optional)</label>
+        <label for="edit-image" class="apf-image-label" id="edit-image-label"
+          style="border:1.5px dashed var(--border);padding:10px;display:block;text-align:center;border-radius:10px;cursor:pointer;color:var(--text-light);background:#fafafa;">
+          📷 Click to upload new image
+        </label>
+        <input type="file" id="edit-image" accept="image/*" style="display:none;">
+        <img id="edit-image-preview" src="" alt="Preview"
+          style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-top:8px;border:1.5px solid var(--border);">
+      </div>
+      <button type="submit" class="modal-submit-btn" id="edit-confirm-btn" style="margin-top:20px;">
+        💾 Save Changes
+      </button>
+    </form>
+  </div>
+
+  <!-- Developer Footer -->
+  <footer style="
+    display:flex;flex-direction:column;align-items:center;gap:20px;
+    padding:30px 20px;background:var(--bg,#fff);border-top:1px solid var(--border,#F2E0CF);
+    margin-top:40px;text-align:center;color:var(--text,#111827);
+  ">
+    <div style="font-size:1.1rem;font-weight:800;color:var(--accent,#E94560);">
+      Copyright &copy; 2026
+    </div>
+    
+    <div style="background:var(--card,#FFF3E8);border:1px solid var(--border,#F2E0CF);border-radius:14px;padding:20px;max-width:800px;width:100%;">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--blue,#0369a1);margin-bottom:12px;">
+        Founders Name: Pallapolu Ravi Kumar Reddy
+      </div>
+      <div style="font-size:0.95rem;color:var(--muted,#6b7280);display:flex;flex-direction:column;gap:8px;text-align:left;">
+        <p style="margin:0;"><strong>Address 1:</strong> shop No 1: kotha market Janu's Sneha fresh chicken,near new Ongole bus stand,Ongole,Prakasam dt,AP-523001</p>
+        <p style="margin:0;"><strong>Address 2:</strong> R.K.Reddy Sneha fresh chicken,near sky dhaba,beside new flyover,Koppolu road,dreams nagar,Ongole,rakasam dt,AP Ongole</p>
+        <p style="margin:0;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <strong>Phone:</strong> <a href="tel:9290053193" style="color:var(--accent);text-decoration:none;">9290053193</a>, <a href="tel:905991613" style="color:var(--accent);text-decoration:none;">905991613</a></p>
+        <p style="margin:0;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <strong>Email:</strong> <a href="mailto:pallapoluravikumar3@gmail.com" style="color:var(--blue);text-decoration:none;">pallapoluravikumar3@gmail.com</a></p>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:24px;margin-top:10px;">
+       <div style="display:flex;align-items:center;gap:10px;">
+          <img src="images/developer.png" alt="Developer" style="width:40px;height:40px;object-fit:contain;">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+             <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Developer Name</span>
+             <span style="font-size:0.95rem;font-weight:800;color:var(--text,#111827);">Poojan sri</span>
+          </div>
+       </div>
+
+       <div style="display:none;width:1px;height:35px;background:var(--border,#F2E0CF);@media(min-width:600px){display:block;}"></div>
+
+       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+          <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> GitHub</span>
+          <div style="font-size:0.95rem;font-weight:800;">
+             <a href="https://github.com/parapoojansri-hue" style="color:var(--blue,#0369a1);text-decoration:none;" target="_blank">parapoojansri-hue</a>
+          </div>
+       </div>
+
+       <div style="display:none;width:1px;height:35px;background:var(--border,#F2E0CF);@media(min-width:600px){display:block;}"></div>
+
+       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+          <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Contact</span>
+          <div style="font-size:0.95rem;font-weight:800;">
+             <a href="tel:8309529483" style="color:var(--accent);text-decoration:none;">8309529483</a>
+          </div>
+       </div>
+
+       <div style="display:none;width:1px;height:35px;background:var(--border,#F2E0CF);@media(min-width:600px){display:block;}"></div>
+
+       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+          <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</span>
+          <a href="https://instagram.com/_poojan.chowdhary_" style="font-size:0.95rem;font-weight:800;color:#E1306C;text-decoration:none;" target="_blank">_poojan.chowdhary_</a>
+       </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/customer.js"></script>
+</body>
+
+</html>

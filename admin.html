@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm2Buy - Fresh Farm Products Online</title>
+  <meta name="description" content="Admin Dashboard - Manage products and store settings">
+  <meta property="og:title" content="RK FARMS - Admin Dashboard">
+  <meta property="og:image" content="images/logo.jpg">
+  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ── Header ────────────────────────────────────────── -->
+    <div class="dash-header">
+      <span class="brand" style="display:flex; align-items:center; gap: 16px;">
+        <img src="images/logo.jpg" alt="RK FARMS" style="height:80px;object-fit:contain;margin:-10px 0;">
+
+        <!-- Catchy Welcome Slogan -->
+        <div class="welcome-slogan">
+          <div class="slogan-title">
+            <span class="slogan-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
+            <h2>Welcome to RK Farms</h2>
+          </div>
+          <p>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Your Trusted Source for Fresh &amp; Hygienic Chicken
+          </p>
+        </div>
+      </span>
+      <div class="user-info">
+        <img src="images/admin.png" alt="Admin" style="width:24px;height:24px;object-fit:cover;border-radius:4px;border:1px solid var(--border);">
+        <span id="user-email">Loading…</span>
+        <span class="role-tag"><span class="icon-md" style="font-size:14px;vertical-align:middle;">admin_panel_settings</span> Admin</span>
+        <a href="customer.html" class="btn-shop" style="padding:7px 14px;font-size:0.82rem;display:flex;align-items:center;gap:6px;text-decoration:none;border-radius:999px;"><span class="icon-md" style="font-size:17px;">shopping_bag</span>Back to Shop</a>
+        <button class="btn-logout" id="logout-btn" style="padding:7px 14px;font-size:0.82rem;display:flex;align-items:center;gap:6px;border-radius:999px;"><span class="icon-md" style="font-size:17px;">logout</span>Logout</button>
+      </div>
+    </div>
+
+    <!-- ── Page title ────────────────────────────────────── -->
+    <h1><span class="icon-md" style="font-size:2rem;color:#e94560;">admin_panel_settings</span> Admin Dashboard</h1>
+    <p style="margin-bottom:28px;">Manage your product catalogue and monitor all incoming orders in real time.</p>
+
+    <!-- ── Stats row ─────────────────────────────────────── -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="product-count">—</div>
+        <div class="stat-label"><span class="icon-md" style="font-size:16px;color:#38bdf8;">inventory_2</span> Products</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-count">—</div>
+        <div class="stat-label"><span class="icon-md" style="font-size:16px;">receipt_long</span> Total Orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="paid-count">—</div>
+        <div class="stat-label"><span class="icon-md" style="font-size:16px;color:#4ade80;">payments</span> Paid</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="pending-count">—</div>
+        <div class="stat-label"><span class="icon-md" style="font-size:16px;color:#f5a623;">pending</span> Pending Payment</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="revenue-count">₹0</div>
+        <div class="stat-label"><span class="icon-md" style="font-size:16px;color:#10b981;">account_balance_wallet</span> Total Sales</div>
+      </div>
+    </div>
+
+
+    <!-- ── Products catalogue ─────────────────────────────── -->
+    <div class="section-heading">
+      <h2><span class="icon-md">inventory_2</span> Your Products</h2>
+    </div>
+    <div class="product-grid" id="admin-products-list">
+      <div class="loader"><span class="spinner"></span>Loading…</div>
+    </div>
+
+    <hr>
+
+    <!-- ── Live orders ────────────────────────────────────── -->
+    <div class="section-heading" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <h2><span class="icon-md">list_alt</span> Live Orders</h2>
+        <span class="live-indicator"><span class="live-dot"></span>Live</span>
+      </div>
+      <div class="bulk-actions" style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);">
+        <label for="delete-date-input" style="font-size: 0.85rem; font-weight: 600;">Delete by Date:</label>
+        <input type="date" id="delete-date-input" style="padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: var(--text-primary); font-family: inherit; font-size: 0.85rem;">
+        <button id="delete-date-btn" class="btn-ghost" style="padding: 6px 10px; font-size: 0.85rem; color:#f87171; border-color:rgba(248,113,113,0.3);"><span class="icon-md" style="font-size: 16px; margin-right: 4px; vertical-align: middle;">delete_sweep</span>Clear Orders</button>
+      </div>
+    </div>
+    <div class="orders-list" id="live-orders-container">
+      <div class="loader"><span class="spinner"></span>Connecting…</div>
+    </div>
+
+  </div><!-- /container -->
+
+  <div id="toast"></div>
+
+  <!-- ── Edit Product Modal ──────────────────────────────── -->
+  <div id="edit-product-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+    <div style="background:var(--card-bg,#1a1a2e); border:1px solid var(--border,rgba(255,255,255,0.08)); border-radius:16px; padding:28px 32px; width:min(480px,90vw); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2 style="margin:0;font-size:1.2rem;"><span class="icon-md" style="font-size:1.3rem;color:#e94560;vertical-align:middle;margin-right:6px;">edit</span>Edit Product</h2>
+        <button id="edit-modal-close" style="background:none;border:none;color:var(--text-secondary,#94a3b8);font-size:1.4rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      <p style="color:var(--text-secondary,#94a3b8);font-size:0.85rem;margin-bottom:18px;">Update the product name, price, weight, or image.</p>
+      <form id="edit-product-form" style="display:flex;flex-direction:column;gap:14px;">
+        <input type="hidden" id="edit-product-id">
+        <div>
+          <label style="font-size:0.82rem;font-weight:600;margin-bottom:4px;display:block;">Product Name <span style="color:#e94560;">*</span></label>
+          <input id="edit-product-name" type="text" required placeholder="e.g. Premium Chicken Breast" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border,rgba(255,255,255,0.1));background:rgba(255,255,255,0.05);color:var(--text-primary,#f1f5f9);font-family:inherit;font-size:0.95rem;box-sizing:border-box;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:0.82rem;font-weight:600;margin-bottom:4px;display:block;">Price (₹) <span style="color:#e94560;">*</span></label>
+            <input id="edit-product-price" type="number" min="0" step="0.01" required placeholder="349" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border,rgba(255,255,255,0.1));background:rgba(255,255,255,0.05);color:var(--text-primary,#f1f5f9);font-family:inherit;font-size:0.95rem;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:0.82rem;font-weight:600;margin-bottom:4px;display:block;">Weight (e.g. 500 g or 1 kg)</label>
+            <input id="edit-product-weight" type="text" placeholder="500 g" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border,rgba(255,255,255,0.1));background:rgba(255,255,255,0.05);color:var(--text-primary,#f1f5f9);font-family:inherit;font-size:0.95rem;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:0.82rem;font-weight:600;margin-bottom:4px;display:block;">Category</label>
+          <select id="edit-product-category" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border,rgba(255,255,255,0.1));background:rgba(255,255,255,0.05);color:var(--text-primary,#f1f5f9);font-family:inherit;font-size:0.95rem;box-sizing:border-box;">
+            <option value="regular" style="background:#1a1a2e;color:#fff;">Current Hits (Main)</option>
+            <option value="daily" style="background:#1a1a2e;color:#fff;">What's Cooking Today</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.82rem;font-weight:600;margin-bottom:6px;display:block;">Product Image (optional)</label>
+          <img id="edit-product-img-preview" src="" alt="preview" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.1);">
+          <label id="edit-product-img-label" for="edit-product-image-file" style="display:block;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:0.85rem;cursor:pointer;text-align:center;">📷 Click to upload image from device</label>
+          <input id="edit-product-image-file" type="file" accept="image/*" style="display:none;">
+        </div>
+        <div id="edit-product-error" style="display:none;color:#f87171;font-size:0.82rem;padding:8px 12px;background:rgba(248,113,113,0.1);border-radius:6px;border:1px solid rgba(248,113,113,0.3);"></div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <button type="button" id="edit-modal-cancel" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border,rgba(255,255,255,0.1));background:rgba(255,255,255,0.05);color:var(--text-secondary,#94a3b8);font-family:inherit;font-size:0.9rem;cursor:pointer;">Cancel</button>
+          <button type="submit" id="edit-product-save" style="flex:2;padding:11px;border-radius:8px;border:none;background:linear-gradient(135deg,#e94560,#c0392b);color:#fff;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer style="
+    display:flex;flex-direction:column;align-items:center;gap:20px;
+    padding:30px 20px;background:var(--bg,#fff);border-top:1px solid var(--border,#F2E0CF);
+    margin-top:40px;text-align:center;color:var(--text,#111827);
+  ">
+    <div style="font-size:1.1rem;font-weight:800;color:var(--accent,#E94560);">
+      Copyright &copy; 2026
+    </div>
+    
+    <div style="background:var(--card,#FFF3E8);border:1px solid var(--border,#F2E0CF);border-radius:14px;padding:20px;max-width:800px;width:100%;">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--blue,#0369a1);margin-bottom:12px;">
+        Founders Name: Pallapolu Ravi Kumar Reddy
+      </div>
+      <div style="font-size:0.95rem;color:var(--muted,#6b7280);display:flex;flex-direction:column;gap:8px;text-align:left;">
+        <p style="margin:0;"><strong>Address 1:</strong> shop No 1: kotha market Janu's Sneha fresh chicken,near new Ongole bus stand,Ongole,Prakasam dt,AP-523001</p>
+        <p style="margin:0;"><strong>Address 2:</strong> R.K.Reddy Sneha fresh chicken,near sky dhaba,beside new flyover,Koppolu road,dreams nagar,Ongole,rakasam dt,AP Ongole</p>
+        <p style="margin:0;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <strong>Phone:</strong> <a href="tel:9290053193" style="color:var(--accent);text-decoration:none;">9290053193</a>, <a href="tel:905991613" style="color:var(--accent);text-decoration:none;">905991613</a></p>
+        <p style="margin:0;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <strong>Email:</strong> <a href="mailto:pallapoluravikumar3@gmail.com" style="color:var(--blue);text-decoration:none;">pallapoluravikumar3@gmail.com</a></p>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:24px;margin-top:10px;">
+       <div style="display:flex;align-items:center;gap:10px;">
+          <img src="images/developer.png" alt="Developer" style="width:40px;height:40px;object-fit:contain;">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+             <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Developer Name</span>
+             <span style="font-size:0.95rem;font-weight:800;color:var(--text,#111827);">Poojan sri</span>
+          </div>
+       </div>
+
+       <div style="display:none;width:1px;height:35px;background:var(--border,#F2E0CF);@media(min-width:600px){display:block;}"></div>
+
+       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+          <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> GitHub</span>
+          <div style="font-size:0.95rem;font-weight:800;">
+             <a href="https://github.com/parapoojansri-hue" style="color:var(--blue,#0369a1);text-decoration:none;" target="_blank">parapoojansri-hue</a>
+          </div>
+       </div>
+
+       <div style="display:none;width:1px;height:35px;background:var(--border,#F2E0CF);@media(min-width:600px){display:block;}"></div>
+
+       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+          <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Contact</span>
+          <div style="font-size:0.95rem;font-weight:800;">
+             <a href="tel:8309529483" style="color:var(--accent);text-decoration:none;">8309529483</a>
+          </div>
+       </div>
+
+       <div style="display:none;width:1px;height:35px;background:var(--border,#F2E0CF);@media(min-width:600px){display:block;}"></div>
+
+       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;">
+          <span style="font-size:0.75rem;color:var(--muted,#6b7280);font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</span>
+          <a href="https://instagram.com/_poojan.chowdhary_" style="font-size:0.95rem;font-weight:800;color:#E1306C;text-decoration:none;" target="_blank">_poojan.chowdhary_</a>
+       </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Seed Products – RK FARMS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 36px 40px;
+      max-width: 540px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; color: #f8fafc; }
+    p  { color: #94a3b8; font-size: 0.92rem; margin-bottom: 24px; line-height: 1.6; }
+    #log {
+      text-align: left;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 0.85rem;
+      line-height: 2;
+      min-height: 60px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .log-item { display: flex; align-items: center; gap: 8px; }
+    .log-item.ok   { color: #4ade80; }
+    .log-item.err  { color: #f87171; }
+    .log-item.info { color: #94a3b8; }
+    button {
+      background: linear-gradient(135deg, #e94560, #c0392b);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 32px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .done-msg { 
+      color: #4ade80; font-weight: 700; font-size: 1rem;
+      margin-top: 8px; display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🐔 Seed Default Products</h1>
+    <p>Click the button below to add all 4 default products into your Firestore database.<br>
+       <strong>This will only add new documents — it won't overwrite existing ones.</strong></p>
+
+    <div id="log"><span class="log-item info">⏳ Ready. Click the button to start.</span></div>
+
+    <button id="seed-btn" onclick="seedProducts()">➕ Add Default Products to Firestore</button>
+    <div class="done-msg" id="done-msg">✅ All products added! You can close this tab.</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBm5g2CEee6iQ-RpNkuTVxYzuU0cNOEK5o",
+      authDomain:        "collection-5c823.firebaseapp.com",
+      projectId:         "collection-5c823",
+      storageBucket:     "collection-5c823.firebasestorage.app",
+      messagingSenderId: "37557011323",
+      appId:             "1:37557011323:web:eb4b5998a3f703c69073de"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const DEFAULT_PRODUCTS = [
+      {
+        name:          'Original Chicken Curry Cut',
+        price:         249,
+        originalPrice: 299,
+        badge:         'Best',
+        weight:        '500g',
+        serves:        'Serves 2',
+        description:   'Freshly cut curry pieces, perfect for a classic chicken curry.'
+      },
+      {
+        name:          'Premium Chicken Breast',
+        price:         349,
+        originalPrice: 399,
+        badge:         'New',
+        weight:        '500g',
+        serves:        'Serves 2',
+        description:   'Boneless, skinless chicken breast — ideal for grilling or meal prep.'
+      },
+      {
+        name:        'Farm Fresh Classic Eggs',
+        price:       125,
+        badge:       'Cold',
+        weight:      '12 pcs',
+        serves:      'Daily Breakfast',
+        description: 'Farm-fresh eggs delivered daily. High protein, rich taste.'
+      },
+      {
+        name:          'Chicken Keema (Mince)',
+        price:         310,
+        originalPrice: 350,
+        weight:        '500g',
+        serves:        'Serves 3-4',
+        description:   'Finely minced chicken keema, great for kebabs, curries and wraps.'
+      }
+    ];
+
+    const logEl  = document.getElementById('log');
+    const btn    = document.getElementById('seed-btn');
+    const doneEl = document.getElementById('done-msg');
+
+    function addLog(msg, type = 'info') {
+      const el = document.createElement('div');
+      el.className = `log-item ${type}`;
+      el.textContent = msg;
+      logEl.appendChild(el);
+    }
+
+    window.seedProducts = async function () {
+      btn.disabled = true;
+      logEl.innerHTML = '';
+      doneEl.style.display = 'none';
+      addLog('🚀 Starting seed…', 'info');
+
+      let success = 0;
+      let failed  = 0;
+
+      for (const product of DEFAULT_PRODUCTS) {
+        try {
+          await addDoc(collection(db, 'products'), {
+            ...product,
+            timestamp: serverTimestamp()
+          });
+          addLog(`✅ Added: ${product.name}`, 'ok');
+          success++;
+        } catch (err) {
+          addLog(`❌ Failed: ${product.name} — ${err.message}`, 'err');
+          failed++;
+        }
+      }
+
+      addLog(`─────────────────────────────`, 'info');
+      addLog(`Done! ${success} added, ${failed} failed.`, success === DEFAULT_PRODUCTS.length ? 'ok' : 'err');
+
+      if (success > 0) {
+        doneEl.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = '✅ Done! Refresh admin.html to see products';
+    };
+  </script>
+</body>
+</html>
