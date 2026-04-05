@@ -981,18 +981,43 @@ function closeRatingModal() {
 if (ratingModalClose) ratingModalClose.addEventListener('click', closeRatingModal);
 if (ratingModalOverlay) ratingModalOverlay.addEventListener('click', closeRatingModal);
 
-// Star click handler
+// Star click/touch handler
 if (starContainer) {
   const stars = starContainer.querySelectorAll('span');
-  stars.forEach(star => {
-    star.addEventListener('click', () => {
-      selectedRating = parseInt(star.dataset.value);
-      stars.forEach(s => {
-        const val = parseInt(s.dataset.value);
-        if (val <= selectedRating) s.classList.add('active');
-        else s.classList.remove('active');
-      });
+  
+  function updateStars(rating) {
+    stars.forEach(s => {
+      if (parseInt(s.dataset.value) <= rating) {
+        s.classList.add('active');
+      } else {
+        s.classList.remove('active');
+      }
     });
+  }
+
+  stars.forEach(star => {
+    // Standard click
+    star.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectedRating = parseInt(star.dataset.value);
+      updateStars(selectedRating);
+    });
+
+    // Hover effects for desktop
+    star.addEventListener('mouseenter', () => {
+      updateStars(parseInt(star.dataset.value));
+    });
+    
+    star.addEventListener('mouseleave', () => {
+      updateStars(selectedRating);
+    });
+
+    // Instant touch support for mobile (bypasses click delay)
+    star.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Prevents simulated click later
+      selectedRating = parseInt(star.dataset.value);
+      updateStars(selectedRating);
+    }, { passive: false });
   });
 }
 
